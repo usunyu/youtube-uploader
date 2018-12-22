@@ -11,7 +11,7 @@ USAGE = '''
 
     Usage:
 
-        python youtube_uploader.py yportmaster video.mp4 https://www.bilibili.com/video/av38604809 "《哥谭》第二季"
+        python youtube_uploader.py cailaobanwork video.mp4 https://www.bilibili.com/video/av38604809 "《哥谭》第二季"
 
         python youtube_uploader.py <youtube account> <video file> <origin video url> [playlist]
 
