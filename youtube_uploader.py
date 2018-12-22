@@ -128,6 +128,9 @@ def get_authenticated_service(secrets_file, credentials_file):
     storage = Storage(credentials_file)
     credentials = storage.get()
 
+    if not credentials:
+        print('Credentials file not exists!')
+
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                  http=credentials.authorize(httplib2.Http()))
 
@@ -142,7 +145,7 @@ def upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
     except HttpError as e:
         print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
 
-    print(TAG, 'The custom thumbnail was successfully set.')
+    print('The custom thumbnail was successfully set.')
 
 
 def upload(account, video_file, video_url, playlist):
@@ -214,6 +217,7 @@ def upload(account, video_file, video_url, playlist):
         print('Upload video: ' + title + ' exception!')
     # download thumbnail if upload video success
     if youtube_id:
+        thumbnail_file = None
         try:
             # check image file size
             response = requests.get(thumbnail_url, headers=get_browser_headers())
@@ -221,12 +225,16 @@ def upload(account, video_file, video_url, playlist):
             if image_size >= MIN_THUMBNAIL_SIZE:
                 print('Start download thumbnail...')
                 thumbnail_file = url_download(thumbnail_url)
-                # upload thumbnail
-                upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
             else:
                 print('Thumbnail file too small, skip...')
         except:
             print('Download thumbnail exception!')
+        if thumbnail_file:
+            try:
+                # upload thumbnail
+                upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
+            except:
+                print('Upload thumbnail exception!')
 
 
 def usage():
