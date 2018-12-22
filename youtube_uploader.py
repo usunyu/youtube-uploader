@@ -235,6 +235,8 @@ def upload(account, video_file, video_url, playlist):
                 upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
             except:
                 print('Upload thumbnail exception!')
+            # remove thumbnails
+            os.remove(thumbnail_file)
 
 
 def usage():
