@@ -42,6 +42,45 @@ def get_youtube_invalid_tag_chars():
 def get_browser_headers():
     return {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36'}
 
+CHUNK_SIZE = 1024
+
+def url_download(url, headers=get_browser_headers()):
+    try:
+        response = requests.get(url, headers=headers, stream=True)
+        total_size = int(response.headers['content-length'])
+        format = response.headers['Content-Type']
+        filename = 'temp'
+        if format == 'video/mp4':
+            filename = filename + '.mp4'
+        elif format == 'video/x-flv':
+            filename = filename + '.flv'
+        elif format == 'image/jpeg':
+            filename = filename + '.jpg'
+        elif format == 'image/png':
+            filename = filename + '.png'
+        else:
+            print('Unknown content type!')
+            return None
+        file = open(filename, 'wb')
+        print('Start downloading...')
+        download_size = 0
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if chunk: # filter out keep-alive new chunks
+                file.write(chunk)
+                # file.flush()
+            download_size = download_size + CHUNK_SIZE
+            end = '\r'
+            if download_size > total_size:
+                download_size = total_size
+                end = '\r\n'
+            print('Download progress: {:.0%}'.format(float(download_size) / total_size), end=end, flush=True),
+        file.close()
+        print('Download finish!')
+        return filename
+    except:
+        print('Url download exception!')
+        return None
+
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
@@ -145,13 +184,13 @@ def upload(account, video_file, video_url, playlist):
         for invalid_char in get_youtube_invalid_tag_chars():
             tag_name = tag_name.replace(invalid_char, '')
         if tags:
-            tags = tag_name
-        else:
             tags += ', ' + tag_name
+        else:
+            tags = tag_name
     if tags:
         print('Fetched tags: ' + tags)
     # upload video
-    upload_command = 'sudo youtube-upload --title="{}" --description="{}" --category="{}" --tags="{}" --client-secrets="{}" --credentials-file="{}"'.format(
+    upload_command = 'sudo youtube-upload --privacy private --title="{}" --description="{}" --category="{}" --tags="{}" --client-secrets="{}" --credentials-file="{}"'.format(
         title,
         description,
         'Entertainment',
@@ -162,6 +201,7 @@ def upload(account, video_file, video_url, playlist):
     if playlist:
         upload_command += ' --playlist="' + playlist + '"'
     upload_command += ' ' + video_file
+    youtube_id = None
     try:
         print('******************************************')
         print('*  Attention! Password may be required!  *')
@@ -179,6 +219,7 @@ def upload(account, video_file, video_url, playlist):
             response = requests.get(thumbnail_url, headers=get_browser_headers())
             image_size = int(response.headers['content-length'])
             if image_size >= MIN_THUMBNAIL_SIZE:
+                print('Start download thumbnail...')
                 thumbnail_file = url_download(thumbnail_url)
                 # upload thumbnail
                 upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
