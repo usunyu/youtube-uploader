@@ -156,7 +156,7 @@ def upload(account, video_file, video_url, playlist):
     api_url = BILIBILI_API + video_id
     print('Fetching data from ' + api_url + '...')
     try:
-        response = requests.get(api_url)
+        response = requests.get(api_url, headers=get_browser_headers())
     except:
         print('Request api exception!')
         return
