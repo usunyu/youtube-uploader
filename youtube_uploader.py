@@ -59,10 +59,10 @@ def url_download(url, headers=get_browser_headers()):
         elif format == 'image/png':
             filename = filename + '.png'
         else:
-            print('Unknown content type!')
+            print('Unknown content type!\n')
             return None
         file = open(filename, 'wb')
-        print('Start downloading...')
+        print('Start downloading...\n')
         download_size = 0
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             if chunk: # filter out keep-alive new chunks
@@ -75,10 +75,10 @@ def url_download(url, headers=get_browser_headers()):
                 end = '\r\n'
             print('Download progress: {:.0%}'.format(float(download_size) / total_size), end=end, flush=True),
         file.close()
-        print('Download finish!')
+        print('Download finish!\n')
         return filename
     except:
-        print('Url download exception!')
+        print('Url download exception!\n')
         return None
 
 from apiclient.discovery import build
@@ -129,7 +129,7 @@ def get_authenticated_service(secrets_file, credentials_file):
     credentials = storage.get()
 
     if not credentials:
-        print('Credentials file not exists!')
+        print('Credentials file not exists!\n')
 
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                  http=credentials.authorize(httplib2.Http()))
@@ -143,9 +143,9 @@ def upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
         youtube = get_authenticated_service(secrets_file, credentials_file)
         youtube.thumbnails().set(videoId=youtube_id, media_body=thumbnail_file).execute()
     except HttpError as e:
-        print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
+        print('An HTTP error %d occurred:\n%s\n' % (e.resp.status, e.content))
 
-    print('The custom thumbnail was successfully set.')
+    print('The custom thumbnail was successfully set.\n')
 
 
 def upload(account, video_file, video_url, playlist):
@@ -154,15 +154,15 @@ def upload(account, video_file, video_url, playlist):
     # fetch video info
     video_id = re.findall('.*av([0-9]+)', video_url)[0]
     api_url = BILIBILI_API + video_id
-    print('Fetching data from ' + api_url + '...')
+    print('Fetching data from ' + api_url + '...\n')
     try:
         response = requests.get(api_url, headers=get_browser_headers())
     except:
-        print('Request api exception!')
+        print('Request api exception!\n')
         return
     payload = json.loads(response.text)
     if payload['err'] != None:
-        print('Request api error!')
+        print('Request api error!\n')
         return
     data = payload['data']
     title = data['title']
@@ -171,8 +171,8 @@ def upload(account, video_file, video_url, playlist):
         title = title.replace(invalid_char, '')
         description = description.replace(invalid_char, '')
     thumbnail_url = data['pic']
-    print('Fecthed title: ' + title)
-    print('Fetched description: ' + description)
+    print('Fecthed title: ' + title + '\n')
+    print('Fetched description: ' + description + '\n')
     # fetch video tags
     html_session = HTMLSession()
     html_response = html_session.get(video_url)
@@ -180,7 +180,7 @@ def upload(account, video_file, video_url, playlist):
     try:
         html_tags = html_response.html.find('#v_tag', first=True).find('.tag')
     except:
-        print('Fetch video tags exception!')
+        print('Fetch video tags exception!\n')
     tags = None
     for html_tag in html_tags:
         tag_name = html_tag.text
@@ -191,7 +191,7 @@ def upload(account, video_file, video_url, playlist):
         else:
             tags = tag_name
     if tags:
-        print('Fetched tags: ' + tags)
+        print('Fetched tags: ' + tags + '\n')
     if not tags:
         tags = 'entertainment'
     # upload video
@@ -216,7 +216,7 @@ def upload(account, video_file, video_url, playlist):
         if 'Enter verification code: ' in youtube_id:
             youtube_id = youtube_id.replace('Enter verification code: ', '')
     except:
-        print('Upload video: ' + title + ' exception!')
+        print('Upload video: ' + title + ' exception!\n')
     # download thumbnail if upload video success
     if youtube_id:
         thumbnail_file = None
@@ -225,18 +225,18 @@ def upload(account, video_file, video_url, playlist):
             response = requests.get(thumbnail_url, headers=get_browser_headers())
             image_size = int(response.headers['content-length'])
             if image_size >= MIN_THUMBNAIL_SIZE:
-                print('Start download thumbnail...')
+                print('Start download thumbnail...\n')
                 thumbnail_file = url_download(thumbnail_url)
             else:
-                print('Thumbnail file too small, skip...')
+                print('Thumbnail file too small, skip...\n')
         except:
-            print('Download thumbnail exception!')
+            print('Download thumbnail exception!\n')
         if thumbnail_file:
             try:
                 # upload thumbnail
                 upload_thumbnail(secrets_file, credentials_file, youtube_id, thumbnail_file)
             except:
-                print('Upload thumbnail exception!')
+                print('Upload thumbnail exception!\n')
             # remove thumbnails
             os.remove(thumbnail_file)
 
