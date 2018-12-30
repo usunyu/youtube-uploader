@@ -15,6 +15,10 @@ USAGE = '''
 
         python youtube_uploader.py <youtube account> <video file> <origin video url> [playlist]
 
+    Option:
+
+        && osascript -e 'tell application (path to frontmost application as text) to display dialog "The script has completed" buttons {"OK"} with icon caution'
+
 '''
 
 def get_youtube_invalid_content_chars():
