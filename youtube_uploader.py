@@ -199,7 +199,7 @@ def upload(account, video_file, video_url, playlist):
     if not tags:
         tags = 'entertainment'
     # upload video
-    upload_command = 'sudo youtube-upload --privacy private --title="{}" --description="{}" --category="{}" --tags="{}" --client-secrets="{}" --credentials-file="{}"'.format(
+    upload_command = 'sudo youtube-upload --privacy private --title="{}" --description="{}" --category="{}" --tags="{}" --client-secrets="{}" --credentials-file="{}" --chunksize=1024000'.format(
         title,
         description,
         'Entertainment',
