@@ -58,17 +58,13 @@ def url_download(url, headers=get_browser_headers()):
         total_size = int(response.headers['content-length'])
         format = response.headers['Content-Type']
         filename = 'temp'
-        if format == 'video/mp4':
-            filename = filename + '.mp4'
-        elif format == 'video/x-flv':
-            filename = filename + '.flv'
-        elif format == 'image/jpeg':
+        if format == 'image/jpeg':
             filename = filename + '.jpg'
         elif format == 'image/png':
             filename = filename + '.png'
         else:
-            print('Unknown content type!\n')
-            return None
+            print('Unknown content type: {}\n'.format(format))
+            filename = filename + '.png'
         file = open(filename, 'wb')
         print('Start downloading...\n')
         download_size = 0
