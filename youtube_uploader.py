@@ -11,9 +11,9 @@ USAGE = '''
 
     Usage:
 
-        python youtube_uploader.py cailaoban video.mp4 https://www.bilibili.com/video/av38604809 "《哥谭》第二季"
+        sudo python youtube_uploader.py cailaoban video.mp4 https://www.bilibili.com/video/av38604809 "《哥谭》第二季"
 
-        python youtube_uploader.py <youtube account> <video file> <origin video url> [playlist]
+        sudo python youtube_uploader.py <youtube account> <video file> <origin video url> [playlist]
 
     Account:
 
