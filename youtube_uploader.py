@@ -17,7 +17,7 @@ USAGE = '''
 
     Account:
 
-        cailaoban, jieshuo
+        yportkitty, cailaoban, jieshuo
 
     Option:
 
